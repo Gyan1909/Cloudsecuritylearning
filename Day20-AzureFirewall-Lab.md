@@ -62,4 +62,127 @@ You want to monitor incoming and outgoing traffic.
 Your network requires multiple firewalls.
 You want to implement hierarchical firewall policies.
 
+=======================================================================================================
 
+Few Interview Qusetions for Azure Firewall with Answers
+
+**Azure Firewall Interview — Q1**
+
+Your company deployed:
+Hub-Spoke architecture
+Azure Firewall in Hub VNet
+Multiple application VNets in Spokes
+
+But security team discovers:
+
+Some VMs in spoke VNets can still access the internet directly
+Traffic is bypassing Azure Firewall
+
+As a Cloud Security Engineer:
+
+Why could this happen?
+What misconfiguration would you investigate first?
+How would you force all traffic through Azure Firewall?
+Which Azure components are involved in this routing flow?
+How would you validate that traffic is actually inspected by Firewall?
+
+**Answer:-** Traffic bypassing Azure Firewall usually occurs due to missing or incorrect User Defined Routes (UDRs), causing Azure system routes to send traffic directly to the internet.
+
+I would first verify:
+
+route table associations
+next hop configuration
+firewall private IP
+VNet peering
+firewall rules
+
+To force traffic inspection, I would configure UDRs in spoke subnets:
+
+0.0.0.0/0 → Virtual Appliance → Azure Firewall Private IP
+
+Components involved include:
+
+Azure Firewall
+Route Tables
+UDRs
+VNet Peering
+Subnets
+
+To validate inspection, I would use:
+
+Azure Firewall logs
+NSG Flow Logs
+Network Watcher
+Log Analytics
+traceroute/path validation
+
+===============================================================
+
+**Q2** Suppose your company wants:
+
+"Only allow employees to access Microsoft Teams and Office 365 from Azure VMs."
+
+All other internet access should be blocked.
+
+As a Cloud Security Engineer:
+
+How would Azure Firewall help here?
+Which type of Firewall rules would you use?
+Why are NSGs alone NOT enough?
+What Azure Firewall feature makes this possible?
+How would you monitor violations or blocked traffic?
+
+**Answer** Azure Firewall can centrally control outbound internet access by allowing only approved destinations like Microsoft Teams and Office 365 while blocking all other traffic.
+
+I would use:
+Application Rules
+FQDN filtering
+FQDN tags such as Office365
+
+NSGs alone are insufficient because they operate mainly at Layer 3/4 and cannot filter traffic based on domain names or application URLs.
+
+Azure Firewall Application Rules make this possible using FQDN-based filtering.
+
+For monitoring, I would integrate:
+Azure Firewall logs
+Log Analytics
+Sentinel
+Azure Monitor alerts
+
+This would help detect blocked traffic attempts and policy violations.
+==================================================================================================
+
+**Q3** Suppose:
+Azure Firewall is deployed
+Developers complain:
+"We cannot access github.com from Azure VMs."
+
+As a Cloud Security Engineer:
+
+What troubleshooting steps would you perform?
+Which Firewall rule types would you check first?
+How would DNS affect this issue?
+Which logs would help identify the block?
+How would you safely allow GitHub access without opening unrestricted internet access?
+
+**Answer** I would first verify whether Azure Firewall Application Rules are blocking GitHub traffic.
+
+Since GitHub access is domain-based, I would specifically check:
+Application Rules
+Firewall Policies
+DNS resolution
+
+DNS is critical because Azure Firewall uses FQDN-based filtering for application traffic. If DNS resolution fails, GitHub access may fail even if rules appear correct.
+
+I would investigate:
+
+Azure Firewall logs
+Application Rule logs
+Log Analytics queries
+NSG Flow Logs
+
+To safely allow GitHub access, I would create Application Rules allowing:
+
+github.com
+*.github.com
+while continuing to block general unrestricted internet access.
